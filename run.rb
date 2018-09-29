@@ -1,6 +1,14 @@
 require_relative 'processing.rb'
 require 'gruff'
 
+def get_special_color_for_today(days_count)
+  colors = []
+  (1..days_count-1).each do |_|
+    colors << 'gray'
+  end
+  colors << 'black'
+end
+
 data = download_data()
 data.each do |entry|
   puts entry.timestamp # last second of the affected day
@@ -11,12 +19,14 @@ end
 
 split = split_into_days(data)
 
-size = 1200
+
+
+size = 2000
 g = Gruff::Line.new(size)
 g.hide_legend = true
 g.hide_dots = true
 g.theme = {
-  :colors => %w(black grey),
+  :colors => get_special_color_for_today(split.length),
   :marker_color => 'grey',
   :font_color => 'black',
   :background_colors => 'white'
