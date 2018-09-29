@@ -17,10 +17,6 @@ def download_data
   return goal.datapoints
 end
 
-def split_into_singular_chunks(dataset_for_a_day)
-  return dataset_for_a_day
-end
-
 def split_into_days(dataset, end_date=Time.now)
   Date.new(1999, 1, 1)
   # start date is provided by beeminder but end date is not

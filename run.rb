@@ -24,7 +24,6 @@ g.theme = {
 step = 15
 minutes_in_day = 24 * 60
 split.each do |dataset_for_a_day|
-  #dataset_for_a_day = split_into_singular_chunks(dataset_for_a_day)
   minute_since_day_start = step
   dataset_index = 0
   progress = [0]
@@ -53,7 +52,5 @@ puts "GENERATING"
 # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
 # probably I should switch to https://plot.ly/python/
 g.title = 'percentile X'
-#g.labels = { 0 => '5/6', 1 => '5/15', 2 => '5/24', 3 => '5/30', 4 => '6/4',
-#             5 => '6/12', 6 => '6/21', 7 => '6/28' }
 g.write('percentile_feedback.png')
 

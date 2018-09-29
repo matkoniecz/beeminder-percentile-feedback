@@ -18,8 +18,7 @@ This script
 
  - downloads Beeminder data
  - separates data by a day
- - splits datapoints into smaller one, each worth 1
- - for each day generates line that may be later displayed
+ - for each day generates cumulative line of hom much time was logged to beeminder
 
 It is using [beeminder gem](https://github.com/beeminder/beeminder-gem).
 
