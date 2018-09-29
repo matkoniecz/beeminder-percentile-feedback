@@ -1,3 +1,7 @@
+# output
+
+percentile_feedback.png
+
 # protect token file
 *.secret
 
