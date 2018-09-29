@@ -78,6 +78,11 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
         break
       end
     end
+    if day_date.to_date == current_time.to_date
+      if minute_since_day_start > current_time.hour * 60 + current_time.min
+        break
+      end
+    end
     progress << progress[-1] + progressed
     minute_since_day_start += step
   end
