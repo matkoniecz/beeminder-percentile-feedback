@@ -27,12 +27,16 @@ def get_outliers(dataset_split_into_days, percent_to_remove: 10)
   return lower_outliers + upper_outliers
 end
 
-def obtain_data_for_each_day()
-  data = download_data()
-  data.each do |entry|
+def print_datapoint(entry)
     puts entry.timestamp # last second of the affected day
     puts entry.updated_at # time of posting/updating entry (may be on a later date)
     puts entry.value # datapoint value
+end
+
+def obtain_data_for_each_day()
+  data = download_data()
+  data.each do |entry|
+    print_datapoint(entry)
     puts
   end
 
