@@ -3,7 +3,7 @@ require 'gruff'
 
 def get_special_color_for_today(days_count)
   colors = []
-  (1..days_count-1).each do |_|
+  (1..days_count - 1).each do |_|
     colors << 'gray'
   end
   colors << 'black'
@@ -23,18 +23,18 @@ def get_outliers(dataset_split_into_days, percent_to_remove: 10)
 
   day_counts.sort!
   lower_outliers = day_counts[0..day_counts.length * percent_to_remove / 100 / 2]
-  upper_outliers = day_counts[-(day_counts.length * percent_to_remove / 100 / 2)..day_counts.length-1]
+  upper_outliers = day_counts[-(day_counts.length * percent_to_remove / 100 / 2)..day_counts.length - 1]
   return lower_outliers + upper_outliers
 end
 
 def print_datapoint(entry)
-    puts entry.timestamp # last second of the affected day
-    puts entry.updated_at # time of posting/updating entry (may be on a later date)
-    puts entry.value # datapoint value
+  puts entry.timestamp # last second of the affected day
+  puts entry.updated_at # time of posting/updating entry (may be on a later date)
+  puts entry.value # datapoint value
 end
 
-def obtain_data_for_each_day()
-  data = download_data()
+def obtain_data_for_each_day
+  data = download_data
   data.each do |entry|
     print_datapoint(entry)
     puts
@@ -50,10 +50,10 @@ def get_initialized_graph(displayed_lines)
   g.hide_dots = true
   g.line_width = 1
   g.theme = {
-    :colors => get_special_color_for_today(displayed_lines),
-    :marker_color => 'grey',
-    :font_color => 'black',
-    :background_colors => 'white'
+    colors: get_special_color_for_today(displayed_lines),
+    marker_color: 'grey',
+    font_color: 'black',
+    background_colors: 'white'
   }
   return g
 end
@@ -67,9 +67,7 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
     progressed = 0
     while dataset_index < dataset_for_a_day.length
       update_time = dataset_for_a_day[dataset_index].updated_at
-      if update_time.hour * 60 + update_time.min > minute_since_day_start
-        break
-      end
+      break if update_time.hour * 60 + update_time.min > minute_since_day_start
       datapoint = dataset_for_a_day[dataset_index]
       if datapoint.timestamp.to_date == datapoint.updated_at.to_date
         progressed += datapoint.value
@@ -87,8 +85,7 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
   return progress
 end
 
-
-split = obtain_data_for_each_day()
+split = obtain_data_for_each_day
 outliers = get_outliers(split, percent_to_remove: 10)
 g = get_initialized_graph(split.length - outliers.length)
 step = 15
@@ -103,11 +100,11 @@ split.each do |dataset_for_a_day|
 
   total_value = progress[-1].to_i
   location_in_outliers = outliers.index(total_value)
-  if location_in_outliers != nil
+  if !location_in_outliers.nil?
     outliers.delete_at location_in_outliers
     puts "IGNORED AS OUTLIER (#{total_value})"
   else
-    #puts progress.inspect
+    # puts progress.inspect
     g.data :day, progress
   end
 end
@@ -119,4 +116,3 @@ puts "GENERATING"
 # probably I should switch to https://plot.ly/python/
 g.title = 'percentile X'
 g.write('percentile_feedback.png')
-

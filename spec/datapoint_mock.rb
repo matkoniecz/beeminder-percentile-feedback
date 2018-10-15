@@ -1,5 +1,5 @@
-  DatapointMock = Struct.new(:timestamp, :updated_at, :value) do
-  end
+DatapointMock = Struct.new(:timestamp, :updated_at, :value) do
+end
 
 =begin
 datapoints_array has accessible

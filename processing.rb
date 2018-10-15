@@ -6,8 +6,8 @@ class InvalidData < StandardError
 end
 
 def download_data
-  token = File.new("token.secret").read.strip()
-  goal_name = File.new("goal_name.secret").read.strip()
+  token = File.new("token.secret").read.strip
+  goal_name = File.new("goal_name.secret").read.strip
 
   bee = Beeminder::User.new token
 
@@ -17,12 +17,12 @@ def download_data
   return goal.datapoints
 end
 
-def split_into_days(dataset, end_date=Time.now)
+def split_into_days(dataset, end_date = Time.now)
   Date.new(1999, 1, 1)
   # start date is provided by beeminder but end date is not
   # end data is explicit to allow testing
 
-  first_day = (dataset.min_by {|entry| entry.timestamp.to_date }).timestamp.to_date
+  first_day = (dataset.min_by { |entry| entry.timestamp.to_date }).timestamp.to_date
   i = first_day
   by_day = {}
   while i <= end_date.to_date
@@ -43,7 +43,7 @@ def split_into_days(dataset, end_date=Time.now)
   return returned
 end
 
-def percetile_of_day_compared_to_other(dataset, checked_datetime=Time.now, end_date=Time.now)
+def percetile_of_day_compared_to_other(dataset, checked_datetime = Time.now, end_date = Time.now)
   split = split_into_days(dataset)
   # each day check until checked_datetime hour, minute, second - and record value into table
   # on attempting checked_datetime year, month and day record value

@@ -6,7 +6,7 @@ RSpec.describe "PercentileCounter" do
   end
 
   it "calculates percentile below the smallest element to be 0" do
-    expect(get_percentile(-30393, [-100, 88, 33, 1818, 9, 1819])).to eq 0
+    expect(get_percentile(-30_393, [-100, 88, 33, 1818, 9, 1819])).to eq 0
   end
 
   it "calculates percentile of the 1st element of 10 to be 10" do
