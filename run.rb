@@ -66,13 +66,13 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
   dataset_index = 0
   progress = [0]
   while minutes_since_day_start <= minutes_in_day
-    progressed = 0
+    progressed_in_this_time_window = 0
     while dataset_index < dataset_for_a_day.length
       update_time = dataset_for_a_day[dataset_index].updated_at
       break if update_time.hour * 60 + update_time.min > minutes_since_day_start
       datapoint = dataset_for_a_day[dataset_index]
       if datapoint.timestamp.to_date == datapoint.updated_at.to_date
-        progressed += datapoint.value
+        progressed_in_this_time_window += datapoint.value
       end
       dataset_index += 1
     end
@@ -81,7 +81,7 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
       # especially as it would be a flat demotivating one
       break
     end
-    progress << progress[-1] + progressed
+    progress << progress[-1] + progressed_in_this_time_window
     minutes_since_day_start += step
   end
   return progress
