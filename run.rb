@@ -87,34 +87,39 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
   return progress
 end
 
-split = obtain_data_for_each_day
-outliers = get_outliers(split, percent_to_remove: 10)
-g = get_initialized_graph(split.length - outliers.length)
-step = 15
-# first day is guaranted to have 0 datapoint added by beeminder, so [0][0] is safe
-# -1 is done to counteract first incrementation in a loop
-# incrementation is at the beginning of loop to allow for breaks in alter part
-processed_date = split[0][0].timestamp.to_date.next_day(-1)
-now = Time.now
-split.each do |dataset_for_a_day|
-  processed_date = processed_date.next_day(1)
-  progress = get_data_series_for_graph(dataset_for_a_day, processed_date, now, step)
 
-  total_value = progress[-1].to_i
-  location_in_outliers = outliers.index(total_value)
-  if !location_in_outliers.nil?
-    outliers.delete_at location_in_outliers
-    puts "IGNORED AS OUTLIER (#{total_value})"
-  else
-    # puts progress.inspect
-    g.data :day, progress
+def main
+  split = obtain_data_for_each_day
+  outliers = get_outliers(split, percent_to_remove: 10)
+  g = get_initialized_graph(split.length - outliers.length)
+  step = 15
+  # first day is guaranted to have 0 datapoint added by beeminder, so [0][0] is safe
+  # -1 is done to counteract first incrementation in a loop
+  # incrementation is at the beginning of loop to allow for breaks in alter part
+  processed_date = split[0][0].timestamp.to_date.next_day(-1)
+  now = Time.now
+  split.each do |dataset_for_a_day|
+    processed_date = processed_date.next_day(1)
+    progress = get_data_series_for_graph(dataset_for_a_day, processed_date, now, step)
+
+    total_value = progress[-1].to_i
+    location_in_outliers = outliers.index(total_value)
+    if !location_in_outliers.nil?
+      outliers.delete_at location_in_outliers
+      puts "IGNORED AS OUTLIER (#{total_value})"
+    else
+      # puts progress.inspect
+      g.data :day, progress
+    end
   end
+
+  puts "GENERATING"
+
+  # https://github.com/topfunky/gruff
+  # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
+  # probably I should switch to https://plot.ly/python/
+  g.title = "percentile #{percetile_of_day_compared_to_other(split)}"
+  g.write('percentile_feedback.png')
 end
 
-puts "GENERATING"
-
-# https://github.com/topfunky/gruff
-# https://makandracards.com/makandra/8745-plot-graphs-in-ruby
-# probably I should switch to https://plot.ly/python/
-g.title = 'percentile X'
-g.write('percentile_feedback.png')
+main
