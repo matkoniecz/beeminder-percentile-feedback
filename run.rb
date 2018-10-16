@@ -66,9 +66,9 @@ def get_initialized_graph(displayed_lines)
   return g
 end
 
-def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
+def transform_dataset_for_a_day_in_cumulative_progress(dataset_for_a_day, resolution_in_minutes)
   minutes_in_day = 24 * 60
-  minutes_since_day_start = step
+  minutes_since_day_start = resolution_in_minutes
   dataset_index = 0
   progress = [0]
   while minutes_since_day_start <= minutes_in_day
@@ -82,22 +82,22 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
       end
       dataset_index += 1
     end
-    if is_in_future(current_time, day_date, minutes_since_day_start)
-      # stop painting line of what has yet to happen
-      # especially as it would be a flat demotivating one
-      break
-    end
     progress << progress[-1] + progressed_in_this_time_window
-    minutes_since_day_start += step
+    minutes_since_day_start += resolution_in_minutes
   end
   return progress
 end
 
-def is_in_future(current_time, checked_date, minutes_since_day_start)
-  return true if checked_date.to_date > current_time.to_date
-  return false if checked_date.to_date < current_time.to_date
-  raise "unexpected" unless checked_date.to_date == current_time.to_date
-  return minutes_since_day_start > current_time.hour * 60 + current_time.min
+def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, resolution_in_minutes)
+  progress = transform_dataset_for_a_day_in_cumulative_progress(dataset_for_a_day, resolution_in_minutes)
+  if day_date.to_date == current_time.to_date
+      # do not paint line of what has yet to happen
+      # especially as it would be a flat demotivating one
+      wanted_minutes = current_time.hour * 60 + current_time.min
+      wanted_steps = wanted_minutes / resolution_in_minutes
+      return progress[0, wanted_steps]
+  end
+  return progress
 end
 
 def main
