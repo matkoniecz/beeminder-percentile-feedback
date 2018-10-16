@@ -9,6 +9,17 @@ RSpec.describe "split_into_days" do
     DateTime.new(2001, 2, 3)
   end
 
+  it "sets correct order for datapoints" do
+    year = 2001
+    month = 2
+    first_datapoint  = DatapointMock.new(DateTime.new(year, month, 5), DateTime.new(year, month, 5, 12, 19), 1000)
+    second_datapoint = DatapointMock.new(DateTime.new(year, month, 5), DateTime.new(year, month, 5, 12, 29), 1)
+    dataset = [first_datapoint, second_datapoint]
+    end_date = dataset[-1].timestamp
+    split = split_into_days(dataset, end_date)
+    expect(split).to eq [[first_datapoint, second_datapoint]]
+  end
+
   it "splits full dataset into separate days" do
     year = 2001
     month = 2

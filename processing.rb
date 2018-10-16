@@ -40,7 +40,7 @@ def split_into_days(dataset, end_date = Time.now)
 
   returned = []
   by_day.each do |day, datapoint_list|
-    returned << datapoint_list.reverse
+    returned << datapoint_list.sort_by { |entry| entry.timestamp }
   end
   return returned
 end
