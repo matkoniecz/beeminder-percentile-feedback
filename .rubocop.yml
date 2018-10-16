@@ -1,3 +1,12 @@
 inherit_gem:
   matkoniecz-ruby-style:
     - standard_rubocop_config.yml
+
+# blocked by https://github.com/beeminder/beeminder-gem/issues/22
+Style/DateTime:
+  Enabled: false
+
+# in this long lines are better than alternative
+Metrics/LineLength:
+  Exclude:
+    - 'spec/*'
