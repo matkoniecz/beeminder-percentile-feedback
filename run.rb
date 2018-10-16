@@ -11,10 +11,16 @@ def get_special_color_for_today(days_count)
   colors << 'black'
 end
 
-def get_outliers(dataset_split_into_days, percent_to_remove: 10)
+def get_outliers(dataset_split_into_days, current_date, percent_to_remove: 10)
+  processed_date = dataset_split_into_days[0][0].timestamp.to_date.next_day(-1)
   day_counts = []
   dataset_split_into_days.each do |dataset_for_a_day|
+    processed_date = processed_date.next_day(1)
     day_count = 0
+    if processed_date == current_date
+      # do not discard current date even if it is an outlier
+      next
+    end
     dataset_for_a_day.each do |datapoint|
       if datapoint.timestamp.to_date == datapoint.updated_at.to_date
         day_count += datapoint.value
@@ -95,22 +101,23 @@ def is_in_future(current_time, checked_date, minutes_since_day_start)
 end
 
 def main
+  now = Time.now
   split = obtain_data_for_each_day
-  outliers = get_outliers(split, percent_to_remove: 10)
+  outliers = get_outliers(split, current_date: now.to_date, percent_to_remove: 10)
   g = get_initialized_graph(split.length - outliers.length)
   step = 15
   # first day is guaranted to have 0 datapoint added by beeminder, so [0][0] is safe
   # -1 is done to counteract first incrementation in a loop
   # incrementation is at the beginning of loop to allow for breaks in alter part
   processed_date = split[0][0].timestamp.to_date.next_day(-1)
-  now = Time.now
   split.each do |dataset_for_a_day|
     processed_date = processed_date.next_day(1)
     progress = get_data_series_for_graph(dataset_for_a_day, processed_date, now, step)
 
     total_value = progress[-1].to_i
     location_in_outliers = outliers.index(total_value)
-    if !location_in_outliers.nil?
+    if !location_in_outliers.nil? && processed_date != now.to_date
+      # current day is not discarded, even if it is an outlier
       outliers.delete_at location_in_outliers
       puts "IGNORED AS OUTLIER (#{total_value})"
     else
