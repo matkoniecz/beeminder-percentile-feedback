@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'time'
 require 'active_support'
 require 'beeminder'

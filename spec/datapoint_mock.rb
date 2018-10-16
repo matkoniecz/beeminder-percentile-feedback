@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 DatapointMock = Struct.new(:timestamp, :updated_at, :value) do
 end
 

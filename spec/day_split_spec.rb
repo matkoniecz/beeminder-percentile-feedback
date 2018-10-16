@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'date'
 require 'datapoint_mock.rb'
 require_relative '../processing.rb'
