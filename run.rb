@@ -62,31 +62,37 @@ end
 
 def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, step)
   minutes_in_day = 24 * 60
-  minute_since_day_start = step
+  minutes_since_day_start = step
   dataset_index = 0
   progress = [0]
-  while minute_since_day_start <= minutes_in_day
+  while minutes_since_day_start <= minutes_in_day
     progressed = 0
     while dataset_index < dataset_for_a_day.length
       update_time = dataset_for_a_day[dataset_index].updated_at
-      break if update_time.hour * 60 + update_time.min > minute_since_day_start
+      break if update_time.hour * 60 + update_time.min > minutes_since_day_start
       datapoint = dataset_for_a_day[dataset_index]
       if datapoint.timestamp.to_date == datapoint.updated_at.to_date
         progressed += datapoint.value
       end
       dataset_index += 1
     end
-    if day_date.to_date == current_time.to_date
-      if minute_since_day_start > current_time.hour * 60 + current_time.min
-        break
-      end
+    if is_in_future(current_time, day_date, minutes_since_day_start)
+      # stop painting line of what has yet to happen
+      # especially as it would be a flat demotivating one
+      break
     end
     progress << progress[-1] + progressed
-    minute_since_day_start += step
+    minutes_since_day_start += step
   end
   return progress
 end
 
+def is_in_future(current_time, checked_date, minutes_since_day_start)
+  return true if checked_date.to_date > current_time.to_date
+  return false if checked_date.to_date < current_time.to_date
+  raise "unexpected" unless checked_date.to_date == current_time.to_date
+  return minutes_since_day_start > current_time.hour * 60 + current_time.min
+end
 
 def main
   split = obtain_data_for_each_day
