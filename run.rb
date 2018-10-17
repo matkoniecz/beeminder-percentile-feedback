@@ -131,7 +131,7 @@ def main
   # https://github.com/topfunky/gruff
   # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
   # probably I should switch to https://plot.ly/python/
-  g.title = "percentile #{percetile_of_day_compared_to_other(split)}"
+  g.title = "percentile #{percentile_of_day_compared_to_other(split)}"
   g.write('percentile_feedback.png')
 end
 

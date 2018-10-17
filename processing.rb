@@ -45,7 +45,7 @@ def split_into_days(dataset, end_date = Time.now)
   return returned
 end
 
-def percetile_of_day_compared_to_other(dataset_split_by_day, checked_datetime = Time.now, end_date = Time.now)
+def percentile_of_day_compared_to_other(dataset_split_by_day, checked_datetime = Time.now, end_date = Time.now)
   # each day check until checked_datetime hour, minute, second
   # and record value into table
   # on attempting checked_datetime year, month and day record value
