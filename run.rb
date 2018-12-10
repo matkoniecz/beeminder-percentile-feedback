@@ -126,6 +126,8 @@ def main
     end
   end
 
+  raise "unremoved outliers" if outliers.length > 0
+
   puts "GENERATING"
 
   # https://github.com/topfunky/gruff
