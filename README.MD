@@ -24,6 +24,6 @@ It is using [beeminder gem](https://github.com/beeminder/beeminder-gem).
 
 # Configuration
 
-`token.secret` file contains [personal Beeminder access token](http://api.beeminder.com/#auth).
+`token.secret` file contains [personal Beeminder access token](http://api.beeminder.com/#auth). For example if your access token is `blabla123` then the file should contain solely `blabla123` text.
 
 `goal_name.secret` contains name of goal that will be processed.
