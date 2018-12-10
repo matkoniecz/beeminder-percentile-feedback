@@ -91,11 +91,11 @@ end
 def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, resolution_in_minutes)
   progress = transform_dataset_for_a_day_in_cumulative_progress(dataset_for_a_day, resolution_in_minutes)
   if day_date.to_date == current_time.to_date
-      # do not paint line of what has yet to happen
-      # especially as it would be a flat demotivating one
-      wanted_minutes = current_time.hour * 60 + current_time.min
-      wanted_steps = wanted_minutes / resolution_in_minutes
-      return progress[0, wanted_steps]
+    # do not paint line of what has yet to happen
+    # especially as it would be a flat demotivating one
+    wanted_minutes = current_time.hour * 60 + current_time.min
+    wanted_steps = wanted_minutes / resolution_in_minutes
+    return progress[0, wanted_steps]
   end
   return progress
 end
