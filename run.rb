@@ -41,16 +41,6 @@ def print_datapoint(entry)
   puts entry.value # datapoint value
 end
 
-def obtain_data_for_each_day
-  data = download_data
-  data.each do |entry|
-    print_datapoint(entry)
-    puts
-  end
-
-  return split_into_days(data)
-end
-
 def get_initialized_graph(displayed_lines)
   size = 2000
   g = Gruff::Line.new(size)
@@ -100,12 +90,12 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, resolut
   return progress
 end
 
-def main
-  now = Time.now
-  split = obtain_data_for_each_day
-  outliers = get_outliers(split, current_date: now.to_date, percent_to_remove: 10)
-  g = get_initialized_graph(split.length - outliers.length)
+def process_data_and_generate_graph(data)
+  split = split_into_days(data)
   step = 15
+  now = Time.now
+  outliers = get_outliers(split, current_date: now.to_date, percent_to_remove: 10)
+  data_for_graph = []
   # first day is guaranted to have 0 datapoint added by beeminder, so [0][0] is safe
   # -1 is done to counteract first incrementation in a loop
   # incrementation is at the beginning of loop to allow for breaks in alter part
@@ -122,19 +112,40 @@ def main
       puts "IGNORED AS OUTLIER (#{total_value})"
     else
       # puts progress.inspect
-      g.data :day, progress
+      data_for_graph << progress
     end
   end
 
-  raise "unremoved outliers" if outliers.length > 0
+  if outliers.length > 0
+    puts "NOT REMOVED OUTLIERS: #{outliers}"
+  end
+  generate_graph(data_for_graph, split)
+end
+
+def generate_graph(processed_data_for_graph, data_split_into_days)
+  g = get_initialized_graph(processed_data_for_graph.length)
+  processed_data_for_graph.each do |data_for_day|
+    g.data :day, data_for_day
+  end
 
   puts "GENERATING"
 
   # https://github.com/topfunky/gruff
   # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
   # probably I should switch to https://plot.ly/python/
-  g.title = "percentile #{percentile_of_day_compared_to_other(split)}"
+  g.title = "percentile #{percentile_of_day_compared_to_other(data_split_into_days)}"
   g.write('percentile_feedback.png')
 end
 
-main
+def main
+  data = download_data
+  data.each do |entry|
+    print_datapoint(entry)
+    puts
+  end
+  process_data_and_generate_graph(data)
+end
+
+if __FILE__ == $0
+  main
+end
