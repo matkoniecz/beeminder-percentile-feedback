@@ -50,7 +50,25 @@ def percentile_of_day_compared_to_other(dataset_split_by_day, checked_datetime =
   # and record value into table
   # on attempting checked_datetime year, month and day record value
   # count how many are below
-  return "?"
+  current_day = dataset_split_by_day[0][0].timestamp.to_date
+  values_for_each_day = []
+  value_for_checked_day = nil
+  dataset_split_by_day.each do |day|
+    total_counted_for_a_day = 0
+    if day != []
+      day.each do |entry|
+        if entry.updated_at.hour * 60 + entry.updated_at.min <= checked_datetime.hour * 60 + checked_datetime.min
+           total_counted_for_a_day += entry.value
+        end
+      end
+    end
+    if checked_datetime.to_date == current_day
+      value_for_checked_day = total_counted_for_a_day
+    end
+    values_for_each_day << total_counted_for_a_day
+    current_day = current_day.next_day(1)
+  end
+  return get_percentile(value_for_checked_day, values_for_each_day)
 end
 
 def get_percentile(value, dataset)
