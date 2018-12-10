@@ -5,7 +5,7 @@ require 'gruff'
 
 def get_special_color_for_today(days_count)
   colors = []
-  (1..days_count).each do |_|
+  (1..(days_count-1)).each do |_|
     colors << 'gray'
   end
   colors << 'black'
