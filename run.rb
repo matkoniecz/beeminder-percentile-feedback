@@ -62,7 +62,7 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, resolut
     # do not paint line of what has yet to happen
     # especially as it would be a flat demotivating one
     wanted_minutes = current_time.hour * 60 + current_time.min
-    wanted_steps = wanted_minutes / resolution_in_minutes
+    wanted_steps = wanted_minutes / resolution_in_minutes + 1 #+1 because we want also current that started but is not yet finished
     return progress[0, wanted_steps]
   end
   return progress
