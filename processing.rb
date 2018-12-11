@@ -82,22 +82,21 @@ end
 def transform_dataset_for_a_day_in_cumulative_progress(dataset_for_a_day, resolution_in_minutes)
   minutes_in_day = 24 * 60
   minutes_since_day_start = resolution_in_minutes
-  dataset_index = 0
   progress = []
   while minutes_since_day_start <= minutes_in_day
-    progressed_in_this_time_window = 0
+    progressed = 0
+    dataset_index = 0
     while dataset_index < dataset_for_a_day.length
       update_time = dataset_for_a_day[dataset_index].updated_at
-      break if update_time.hour * 60 + update_time.min > minutes_since_day_start
-      datapoint = dataset_for_a_day[dataset_index]
-      if datapoint.timestamp.to_date == datapoint.updated_at.to_date
-        progressed_in_this_time_window += datapoint.value
+      if update_time.hour * 60 + update_time.min < minutes_since_day_start
+        datapoint = dataset_for_a_day[dataset_index]
+        if datapoint.timestamp.to_date == datapoint.updated_at.to_date
+          progressed += datapoint.value
+        end
       end
-      dataset_index += 1
+    dataset_index += 1
     end
-    previous_progress = 0
-    previous_progress = progress[-1]if progress.length > 0
-    progress << previous_progress + progressed_in_this_time_window
+    progress << progressed
     minutes_since_day_start += resolution_in_minutes
   end
   return progress
