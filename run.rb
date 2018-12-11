@@ -117,7 +117,7 @@ end
 
 def main
   data = download_data
-  data.each do |entry|
+  data.reverse_each do |entry|
     print_datapoint(entry)
     puts
   end
