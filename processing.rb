@@ -68,6 +68,7 @@ def percentile_of_day_compared_to_other(dataset_split_by_day, checked_datetime =
     values_for_each_day << total_counted_for_a_day
     current_day = current_day.next_day(1)
   end
+  value_for_checked_day -= 1 # to make result maybe not strictly percentile but more encouraging
   return get_percentile(value_for_checked_day, values_for_each_day)
 end
 
