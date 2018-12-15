@@ -42,6 +42,5 @@ today = Time.now
 data = []
 (-100..0).each do |offset|
   data += get_data_for_a_day(today.next_day(offset))
-  puts(data[-1])
 end
 process_data_and_generate_graph(data)

@@ -2,6 +2,7 @@
 
 require_relative 'processing.rb'
 require 'gruff'
+require 'logger'
 
 def get_special_color_for_today(days_count)
   colors = []
@@ -35,10 +36,10 @@ def get_outliers(dataset_split_into_days, current_date, percent_to_remove: 10)
   return lower_outliers + upper_outliers
 end
 
-def print_datapoint(entry)
-  puts entry.timestamp # last second of the affected day
-  puts entry.updated_at # time of posting/updating entry (may be on a later date)
-  puts entry.value # datapoint value
+def print_datapoint(entry, importance)
+  $logger.add(importance) { entry.timestamp } # last second of the affected day
+  $logger.add(importance) { entry.updated_at } # time of posting/updating entry (may be on a later date)
+  $logger.add(importance) { entry.value } # datapoint value
 end
 
 def get_initialized_graph(displayed_lines)
@@ -87,15 +88,15 @@ def process_data_and_generate_graph(data)
     if !location_in_outliers.nil? && processed_date != now.to_date
       # current day is not discarded, even if it is an outlier
       outliers.delete_at location_in_outliers
-      puts "IGNORED AS OUTLIER (#{total_value})"
+      $logger.info "IGNORED AS OUTLIER (#{total_value})"
     else
-      # puts progress.inspect
+      $logger.debug progress.inspect
       data_for_graph << progress
     end
   end
 
   if outliers.length > 0
-    puts "NOT REMOVED OUTLIERS: #{outliers}"
+    $logger.warn "NOT REMOVED OUTLIERS: #{outliers}"
   end
   generate_graph(data_for_graph, split)
 end
@@ -106,7 +107,7 @@ def generate_graph(processed_data_for_graph, data_split_into_days)
     g.data :day, data_for_day
   end
 
-  puts "GENERATING"
+  $logger.info "GENERATING"
 
   # https://github.com/topfunky/gruff
   # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
@@ -118,12 +119,19 @@ end
 def main
   data = download_data
   data.reverse_each do |entry|
-    print_datapoint(entry)
-    puts
+    print_datapoint(entry, Logger::INFO)
+    $logger.info ""
   end
   process_data_and_generate_graph(data)
 end
 
+$logger = Logger.new(STDOUT)
+$logger.formatter = proc do |severity, datetime, _progname, msg|
+  "#{severity} [#{datetime.strftime('%Y-%m-%d %H:%M:%S.%6N')} ##{Process.pid}]: #{msg}\n"
+end
+$logger.level = Logger::WARN
+
 if __FILE__ == $0
+  $logger.level = Logger::INFO
   main
 end
