@@ -114,6 +114,7 @@ def generate_graph(processed_data_for_graph, data_split_into_days)
   # probably I should switch to https://plot.ly/python/
   g.title = "percentile #{percentile_of_day_compared_to_other(data_split_into_days)}"
   g.write('percentile_feedback.png')
+  `eog percentile_feedback.png`
 end
 
 def main
