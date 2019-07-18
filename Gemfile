@@ -1,4 +1,7 @@
 # frozen_string_literal: true
+source 'https://rubygems.org'
 
 gem 'beeminder'
+gem 'gruff'
+gem 'logger'
 gem 'matkoniecz-ruby-style'
