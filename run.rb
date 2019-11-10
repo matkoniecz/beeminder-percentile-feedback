@@ -4,6 +4,47 @@ require_relative 'processing.rb'
 require 'gruff'
 require 'logger'
 
+def main
+  data = download_data
+  data.reverse_each do |entry|
+    print_datapoint(entry, Logger::INFO)
+    $logger.info ""
+  end
+  process_data_and_generate_graph(data)
+end
+
+def process_data_and_generate_graph(data)
+  split = split_into_days(data)
+  step = 15
+  now = Time.now
+  outliers = get_outliers(split, current_date: now.to_date, percent_to_remove: 10)
+  data_for_graph = []
+  # first day is guaranted to have 0 datapoint added by beeminder, so [0][0] is safe
+  # -1 is done to counteract first incrementation in a loop
+  # incrementation is at the beginning of loop to allow for breaks in alter part
+  processed_date = split[0][0].timestamp.to_date.next_day(-1)
+  split.each do |dataset_for_a_day|
+    processed_date = processed_date.next_day(1)
+    progress = get_data_series_for_graph(dataset_for_a_day, processed_date, now, step)
+
+    total_value = progress[-1].to_i
+    location_in_outliers = outliers.index(total_value)
+    if !location_in_outliers.nil? && processed_date != now.to_date
+      # current day is not discarded, even if it is an outlier
+      outliers.delete_at location_in_outliers
+      $logger.info "IGNORED AS OUTLIER (#{total_value})"
+    else
+      $logger.debug progress.inspect
+      data_for_graph << progress
+    end
+  end
+
+  if outliers.length > 0
+    $logger.warn "NOT REMOVED OUTLIERS: #{outliers}"
+  end
+  generate_graph(data_for_graph, split)
+end
+
 def get_special_color_for_today(days_count)
   colors = []
   (1..(days_count-1)).each do |_|
@@ -69,38 +110,6 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, resolut
   return progress
 end
 
-def process_data_and_generate_graph(data)
-  split = split_into_days(data)
-  step = 15
-  now = Time.now
-  outliers = get_outliers(split, current_date: now.to_date, percent_to_remove: 10)
-  data_for_graph = []
-  # first day is guaranted to have 0 datapoint added by beeminder, so [0][0] is safe
-  # -1 is done to counteract first incrementation in a loop
-  # incrementation is at the beginning of loop to allow for breaks in alter part
-  processed_date = split[0][0].timestamp.to_date.next_day(-1)
-  split.each do |dataset_for_a_day|
-    processed_date = processed_date.next_day(1)
-    progress = get_data_series_for_graph(dataset_for_a_day, processed_date, now, step)
-
-    total_value = progress[-1].to_i
-    location_in_outliers = outliers.index(total_value)
-    if !location_in_outliers.nil? && processed_date != now.to_date
-      # current day is not discarded, even if it is an outlier
-      outliers.delete_at location_in_outliers
-      $logger.info "IGNORED AS OUTLIER (#{total_value})"
-    else
-      $logger.debug progress.inspect
-      data_for_graph << progress
-    end
-  end
-
-  if outliers.length > 0
-    $logger.warn "NOT REMOVED OUTLIERS: #{outliers}"
-  end
-  generate_graph(data_for_graph, split)
-end
-
 def generate_graph(processed_data_for_graph, data_split_into_days)
   g = get_initialized_graph(processed_data_for_graph.length)
   processed_data_for_graph.each do |data_for_day|
@@ -123,15 +132,6 @@ def generate_graph(processed_data_for_graph, data_split_into_days)
     # In parent
     Process.detach(pid)
   end
-end
-
-def main
-  data = download_data
-  data.reverse_each do |entry|
-    print_datapoint(entry, Logger::INFO)
-    $logger.info ""
-  end
-  process_data_and_generate_graph(data)
 end
 
 $logger = Logger.new(STDOUT)
