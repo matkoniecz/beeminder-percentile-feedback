@@ -121,7 +121,7 @@ def generate_graph(processed_data_for_graph, data_split_into_days)
   # https://github.com/topfunky/gruff
   # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
   # probably I should switch to https://plot.ly/python/
-  g.title = "percentile #{percentile_of_day_compared_to_other(data_split_into_days)}"
+  g.title = "percentile #{percentile_of_day_compared_to_other(data_split_into_days)} for #{goal_name()}"
   g.write('percentile_feedback.png')
   pid = Process.fork
   if pid.nil? then
