@@ -68,11 +68,20 @@ def get_outliers(dataset_split_into_days, current_date, percent_to_remove: 10)
     end
     day_counts << day_count.to_i
   end
+  return get_outliers_from_number_array(day_counts, percent_to_remove)
+end
 
-  day_counts.sort!
-  lower_outliers = day_counts[0..day_counts.length * percent_to_remove / 100 / 2]
-  upper_outliers = day_counts[-(day_counts.length * percent_to_remove / 100 / 2)..day_counts.length - 1]
-  return lower_outliers + upper_outliers
+def get_outliers_from_number_array(array_of_numbers, percent_to_declare_as_outliers)
+  array_of_numbers.sort!
+  outlier_count = array_of_numbers.length * percent_to_declare_as_outliers / 100
+  outliers_on_each_side = outlier_count / 2 
+  returned = []
+  array_of_numbers.each_with_index do |number, index|
+    if index < outliers_on_each_side || index > (array_of_numbers.length - 1 - outliers_on_each_side)
+      returned << number
+    end
+  end
+  return returned
 end
 
 def print_datapoint(entry, importance)
