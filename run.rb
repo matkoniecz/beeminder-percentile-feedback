@@ -1,25 +1,28 @@
 require_relative 'processing.rb'
 require 'gruff'
 require 'logger'
+require 'json'
 
 def token
   return File.new("token.secret").read.strip
 end
 
-def goal_name
-  return File.new("goal_name.secret").read.strip
+def goal_names
+  return JSON.parse(File.new("goal_names.secret").read.strip)
 end
 
 def main
-  data = download_data(goal_name(), token())
-  data.reverse_each do |entry|
-    print_datapoint(entry, Logger::INFO)
-    $logger.info ""
+  goal_names().each do |goal|
+    data = download_data(goal, token())
+    data.reverse_each do |entry|
+      print_datapoint(entry, Logger::INFO)
+      $logger.info ""
+    end
+    process_data_and_generate_graph(data, goal)
   end
-  process_data_and_generate_graph(data)
 end
 
-def process_data_and_generate_graph(data)
+def process_data_and_generate_graph(data, goal_name)
   split = split_into_days(data)
   step = 15
   now = Time.now
@@ -48,7 +51,7 @@ def process_data_and_generate_graph(data)
   if outliers.length > 0
     $logger.warn "NOT REMOVED OUTLIERS: #{outliers}"
   end
-  generate_graph(data_for_graph, split)
+  generate_graph(data_for_graph, split, goal_name)
 end
 
 def get_special_color_for_today(days_count)
@@ -125,7 +128,7 @@ def get_data_series_for_graph(dataset_for_a_day, day_date, current_time, resolut
   return progress
 end
 
-def generate_graph(processed_data_for_graph, data_split_into_days)
+def generate_graph(processed_data_for_graph, data_split_into_days, goal_name)
   g = get_initialized_graph(processed_data_for_graph.length)
   processed_data_for_graph.each do |data_for_day|
     g.data :day, data_for_day
@@ -136,12 +139,12 @@ def generate_graph(processed_data_for_graph, data_split_into_days)
   # https://github.com/topfunky/gruff
   # https://makandracards.com/makandra/8745-plot-graphs-in-ruby
   # probably I should switch to https://plot.ly/python/
-  g.title = "percentile #{percentile_of_day_compared_to_other(data_split_into_days)} for #{goal_name()}"
-  g.write('percentile_feedback.png')
+  g.title = "percentile #{percentile_of_day_compared_to_other(data_split_into_days)} for #{goal_name}"
+  g.write('percentile_feedback_' + goal_name + '.png')
   pid = Process.fork
   if pid.nil? then
     # In child
-    `eog percentile_feedback.png`
+    `eog percentile_feedback_#{goal_name}.png`
     exit
   else
     # In parent
