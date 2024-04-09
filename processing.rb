@@ -17,9 +17,9 @@ def download_data(goal_name, token)
 end
 
 def split_into_days(dataset, end_date = Time.now)
-  Date.new(1999, 1, 1)
+  # Date.new(1999, 1, 1)
   # start date is provided by beeminder but end date is not
-  # end data is explicit to allow testing
+  # end date is explicit to allow testing
 
   first_day = (dataset.min_by { |entry| entry.timestamp.to_date }).timestamp.to_date
   i = first_day
