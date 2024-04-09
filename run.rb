@@ -2,8 +2,16 @@ require_relative 'processing.rb'
 require 'gruff'
 require 'logger'
 
+def token
+  return File.new("token.secret").read.strip
+end
+
+def goal_name
+  return File.new("goal_name.secret").read.strip
+end
+
 def main
-  data = download_data
+  data = download_data(goal_name(), token())
   data.reverse_each do |entry|
     print_datapoint(entry, Logger::INFO)
     $logger.info ""

@@ -7,15 +7,7 @@ require 'beeminder'
 class InvalidData < StandardError
 end
 
-def token
-  return File.new("token.secret").read.strip
-end
-
-def goal_name
-  return File.new("goal_name.secret").read.strip
-end
-
-def download_data
+def download_data(goal_name, token)
   bee = Beeminder::User.new token
 
   goal = bee.goal goal_name
